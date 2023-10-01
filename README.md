@@ -16,8 +16,8 @@ but the underlying process of the functions we don't really know about.
 ## Communication b/w Processor and GPU
 
 In OpenGL, we make 2 kind of programs
-    - Driver Program
-    - Shader Program
+- Driver Program
+- Shader Program
 
 ### Driver Program
 
