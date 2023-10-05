@@ -1,9 +1,10 @@
 #include <VertexBuffer.h>
-#include <VertexBufferLayout.h>
+
+class VertexBufferLayout;
 
 class VertexArray {
 	private:
-		GLuint m_RendererID;
+		unsigned int m_RendererID;
 	public:
 		VertexArray();
 		~VertexArray();

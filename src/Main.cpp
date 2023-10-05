@@ -5,9 +5,9 @@
 
 #include <GL/glew.h>
 
-#include <Renderer.h>
 #include <IndexBuffer.h>
 #include <VertexArray.h>
+#include <VertexBufferLayout.h>
 #include <Shader.h>
 
 int main(void)
@@ -75,6 +75,8 @@ int main(void)
 	ib.Unbind();
 	shader.Unbind();
 
+	Renderer renderer;
+
 	// Get the location of the uniform
 	float r = 0.0f;
 	float g = 0.0f;
@@ -87,17 +89,10 @@ int main(void)
 	while (!glfwWindowShouldClose(window))
 	{
 		/* Render here */
-		GLCall(glClear(GL_COLOR_BUFFER_BIT));
-
 		shader.Bind();
 		shader.SetUniform4f("u_Color", r, g, b, 1.0f);
 
-		va.Bind();
-		ib.Bind();
-
-		GLCall(glDrawElements(GL_TRIANGLES, 
-					sizeof(indices) / sizeof(unsigned int), 
-					GL_UNSIGNED_INT, nullptr));
+		renderer.Draw(va, ib, shader);
 
 		if (r > 1.0f) {
 			r_increment = -0.05f;
