@@ -9,6 +9,7 @@
 #include <VertexArray.h>
 #include <VertexBufferLayout.h>
 #include <Shader.h>
+#include <Texture.h>
 
 int main(void)
 {
@@ -39,10 +40,10 @@ int main(void)
 	}
 
 	float positions[] = {
-		-1.0f, -1.0f, // 0
-		1.0f,  1.0f, // 1
-		1.0f, -1.0f, // 2
-		-1.0f,  1.0f  // 3 
+		-1.0f, -1.0f, 0.0f, 0.0f, // 0
+		1.0f,  1.0f, 1.0f, 1.0f, // 1
+		1.0f, -1.0f, 1.0f, 0.0f, // 2
+		-1.0f,  1.0f, 0.0f, 1.0f // 3 
 	};
 
 	unsigned int indices[] = {
@@ -50,14 +51,18 @@ int main(void)
 		1, 3, 0
 	};
 
+	GLCall(glEnable(GL_BLEND));
+	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
 	unsigned int vao; // Vertex array object
 	GLCall(glGenVertexArrays(1, &vao));
 	GLCall(glBindVertexArray(vao));
 
 	VertexArray va;
-	VertexBuffer vb(positions, 4 * 2 * sizeof(float));
+	VertexBuffer vb(positions, 4 * 4 * sizeof(float));
 
 	VertexBufferLayout layout;
+	layout.AddFloat(2);
 	layout.AddFloat(2);
 	va.AddBuffer(vb, layout);
 
@@ -69,6 +74,10 @@ int main(void)
 	shader.Bind();
 
 	shader.SetUniform4f("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
+
+	Texture texture("./res/textures/texture.png");
+	texture.Bind();
+	shader.SetUniform1i("u_Texture", 0);
 
 	va.Unbind();
 	vb.Unbind();
