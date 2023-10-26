@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <string.h>
 
 #include <GL/glew.h>
 
@@ -14,18 +15,35 @@
 int main(void)
 {
 	GLFWwindow* window;
+	GLFWmonitor** monitors;
+	int count, i;
 
 	/* Initialize the library */
 	if (!glfwInit())
 		return -1;
 
+	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Hide the window
+
+	// Get the primary monitor
+	monitors = glfwGetMonitors(&count);
+	for (i = 0; i < count; i++) {
+		if (strcmp(glfwGetMonitorName(monitors[i]), "eDP") == 0) {
+			glfwWindowHint(GLFW_REFRESH_RATE, glfwGetVideoMode(monitors[i])->refreshRate);
+			break;
+		}
+	}
+
+	const GLFWvidmode* mode = glfwGetVideoMode(monitors[i]);
+
 	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(mode->width, mode->height, "Hello World", monitors[i], NULL);
 	if (!window)
 	{
 		glfwTerminate();
 		return -1;
 	}
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
