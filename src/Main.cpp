@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <string.h>
+#include <cstring>
 
 #include <GL/glew.h>
 
