@@ -1,5 +1,5 @@
-CFLAGS = -Wall -std=c++11 -Iinclude -lGL -lglfw -lGLEW
-CC = g++
+CFLAGS = -Wall -std=c++11 -Iinclude -lGL -lglfw -lGLEW -lstdc++
+CC = clang
 
 SRC_DIR = src
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
@@ -13,6 +13,7 @@ OUT_DIR = bin
 .PHONY: all clean
 
 all: $(OBJS)
+	if [ ! -d "bin" ]; then mkdir bin; fi
 	$(CC) $(CFLAGS) $^ -o $(OUT_DIR)/gl_draw
 
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
