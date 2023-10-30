@@ -1,4 +1,4 @@
-CFLAGS = -Wall -std=c++11 -Iinclude -lGL -lglfw -lGLEW -lstdc++
+CFLAGS = -Wall -Wno-unused-command-line-argument -std=c++11 -Iinclude -lGL -lglfw -lGLEW -lstdc++
 CC = clang
 
 SRC_DIR = src
