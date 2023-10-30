@@ -112,6 +112,9 @@ int main(void)
 	float g_increment = 0.03f;
 	float b_increment = 0.04f;
 
+	int count_frames = 0;
+	int data_count = 0;
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
@@ -142,6 +145,18 @@ int main(void)
 		r += r_increment;
 		g += g_increment;
 		b += b_increment;
+
+		count_frames++;
+
+		if (count_frames == 60) {
+			count_frames = 0;
+
+			const std::string& data = std::to_string(data_count++);
+			texture.SetTexture(data, data.length());
+			texture.Bind();
+		} else {
+			texture.Unbind();
+		}
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);

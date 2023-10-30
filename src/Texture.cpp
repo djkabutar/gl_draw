@@ -1,15 +1,16 @@
+#include <iostream>
+#include <cstdlib>
+#include <cstring>
+
 #include <Texture.h>
 #include <Renderer.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
-
-Texture::Texture(const std::string& path)
-	: m_RendererID(0), m_FilePath(path), m_LocalBuffer(nullptr), 
+Texture::Texture(const std::string& frameBufferData)
+	: m_RendererID(0), m_LocalBuffer(nullptr),
 	m_Width(0), m_Height(0), m_BPP(0)
 {
-	stbi_set_flip_vertically_on_load(1);
-	m_LocalBuffer = stbi_load(path.c_str(), &m_Width, &m_Height, &m_BPP, 4);
+	m_LocalBuffer = new unsigned char[FRAME_SIZE];
+	strcpy((char*) m_LocalBuffer, frameBufferData.c_str());
 
 	GLCall(glGenTextures(1, &m_RendererID));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));
@@ -19,17 +20,17 @@ Texture::Texture(const std::string& path)
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
-	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, 
-		GL_RGBA, GL_UNSIGNED_BYTE, m_LocalBuffer));
+	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_Width, m_Height, 0,
+		GL_RGB, GL_UNSIGNED_BYTE, m_LocalBuffer));
 	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
-
-	if (m_LocalBuffer)
-		stbi_image_free(m_LocalBuffer);
 }
 
 Texture::~Texture()
 {
 	GLCall(glDeleteTextures(1, &m_RendererID));
+
+	if (m_LocalBuffer)
+		delete[] m_LocalBuffer;
 }
 
 void Texture::Bind(unsigned int slot) const
@@ -40,5 +41,16 @@ void Texture::Bind(unsigned int slot) const
 
 void Texture::Unbind() const
 {
+	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+}
+
+void Texture::SetTexture(const std::string& data, unsigned int length) const
+{
+	memcpy(m_LocalBuffer, data.c_str(), length);
+	std::cout << "Data: " << data.c_str() << std::endl;
+
+	GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));
+	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_Width, m_Height, 0,
+		GL_RGB, GL_UNSIGNED_BYTE, m_LocalBuffer));
 	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 }

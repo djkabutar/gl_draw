@@ -2,6 +2,8 @@
 
 #include <csignal>
 
+#define FRAME_SIZE 1280*1024*3
+
 class VertexArray;
 class IndexBuffer;
 class Shader;
