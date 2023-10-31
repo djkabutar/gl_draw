@@ -6,11 +6,13 @@
 #include <Renderer.h>
 
 Texture::Texture(const std::string& frameBufferData)
-	: m_RendererID(0), m_LocalBuffer(nullptr),
-	m_Width(0), m_Height(0), m_BPP(0)
+	: m_RendererID(0), m_LocalBuffer(nullptr), m_Width(0), m_Height(0)
 {
 	m_LocalBuffer = new unsigned char[FRAME_SIZE];
-	strcpy((char*) m_LocalBuffer, frameBufferData.c_str());
+	memset(m_LocalBuffer, 0x00, FRAME_SIZE);
+
+	m_Width = 1920;
+	m_Height = 1200;
 
 	GLCall(glGenTextures(1, &m_RendererID));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));
@@ -46,6 +48,7 @@ void Texture::Unbind() const
 
 void Texture::SetTexture(const std::string& data, unsigned int length) const
 {
+	memset(m_LocalBuffer, 0x00, FRAME_SIZE);
 	memcpy(m_LocalBuffer, data.c_str(), length);
 	std::cout << "Data: " << data.c_str() << std::endl;
 

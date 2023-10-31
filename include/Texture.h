@@ -5,7 +5,7 @@ class Texture
 	private:
 		unsigned int m_RendererID;
 		unsigned char* m_LocalBuffer;
-		int m_Width, m_Height, m_BPP; // BPP = Bits Per Pixel
+		int m_Width, m_Height;
 
 	public:
 		Texture(const std::string& frameBufferData);
