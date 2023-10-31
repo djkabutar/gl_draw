@@ -86,7 +86,7 @@ int main(void)
 
 	IndexBuffer ib(indices, 6);
 
-	GLCall(glClearColor(0.2f, 0.3f, 0.8f, 1.0f));
+	GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 
 	Shader shader("./res/shader/basic.shader");
 	shader.Bind();
