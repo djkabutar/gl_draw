@@ -11,8 +11,8 @@ Texture::Texture(const std::string& frameBufferData)
 	m_LocalBuffer = new unsigned char[FRAME_SIZE];
 	memset(m_LocalBuffer, 0x00, FRAME_SIZE);
 
-	m_Width = 1920;
-	m_Height = 1200;
+	m_Width = FRAME_WIDTH;
+	m_Height = FRAME_HEIGHT;
 
 	GLCall(glGenTextures(1, &m_RendererID));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));

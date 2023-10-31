@@ -2,7 +2,10 @@
 
 #include <csignal>
 
-#define FRAME_SIZE 1280*1024*3
+#define FRAME_WIDTH 1280
+#define FRAME_HEIGHT 1024
+#define PIXEL_SIZE 3
+#define FRAME_SIZE FRAME_WIDTH * FRAME_HEIGHT * PIXEL_SIZE
 
 class VertexArray;
 class IndexBuffer;
