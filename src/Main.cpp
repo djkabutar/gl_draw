@@ -26,11 +26,13 @@ int main(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE); // Prevent the window from being minimized
+	glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // Remove the border and title bar
 
 	// Get the primary monitor
 	monitors = glfwGetMonitors(&count);
 	for (i = 0; i < count; i++) {
-		if (strcmp(glfwGetMonitorName(monitors[i]), "eDP") == 0) {
+		if (strcmp(glfwGetMonitorName(monitors[i]), "eDP-1") == 0) {
 			glfwWindowHint(GLFW_REFRESH_RATE, glfwGetVideoMode(monitors[i])->refreshRate);
 			break;
 		}
