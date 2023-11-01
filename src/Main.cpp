@@ -12,11 +12,19 @@
 #include <Shader.h>
 #include <Texture.h>
 
-int main(void)
+int main(int argc, char** argv)
 {
 	GLFWwindow* window;
 	GLFWmonitor** monitors;
 	int count, i;
+	std::string display_name;
+
+	// Get display name from the command line
+	if (argc > 1) {
+		display_name = argv[1];
+	} else {
+		display_name = "eDP-1";
+	}
 
 	/* Initialize the library */
 	if (!glfwInit())
@@ -32,7 +40,7 @@ int main(void)
 	// Get the primary monitor
 	monitors = glfwGetMonitors(&count);
 	for (i = 0; i < count; i++) {
-		if (strcmp(glfwGetMonitorName(monitors[i]), "eDP-1") == 0) {
+		if (strcmp(glfwGetMonitorName(monitors[i]), display_name.c_str()) == 0) {
 			glfwWindowHint(GLFW_REFRESH_RATE, glfwGetVideoMode(monitors[i])->refreshRate);
 			break;
 		}
