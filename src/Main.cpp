@@ -31,9 +31,9 @@ int main(int argc, char** argv)
 		return -1;
 
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Hide the window
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE); // Prevent the window from being minimized
 	glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // Remove the border and title bar
 
@@ -69,6 +69,8 @@ int main(int argc, char** argv)
 		std::cout << "Failed to initialize GLEW" << std::endl;
 		return -1;
 	}
+
+	std::cout << glGetString(GL_VERSION) << std::endl;
 
 	float positions[] = {
 		-1.0f, -1.0f, 0.0f, 0.0f, // 0
