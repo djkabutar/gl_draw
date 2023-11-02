@@ -106,8 +106,6 @@ int main(int argc, char** argv)
 	Shader shader("./res/shader/basic.shader");
 	shader.Bind();
 
-	shader.SetUniform4f("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
-
 	Texture texture("./res/textures/texture.png");
 	texture.Bind();
 	shader.SetUniform1i("u_Texture", 0);
@@ -135,7 +133,6 @@ int main(int argc, char** argv)
 	{
 		/* Render here */
 		shader.Bind();
-		shader.SetUniform4f("u_Color", r, g, b, 1.0f);
 
 		renderer.Draw(va, ib, shader);
 
