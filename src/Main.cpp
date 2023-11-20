@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Hide the window
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE); // Prevent the window from being minimized
 	glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // Remove the border and title bar
@@ -103,7 +103,7 @@ int main(int argc, char** argv)
 
 	GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 
-	Shader shader("./res/shader/basic.shader");
+	Shader shader("./res/shader/VertShader.shader", "./res/shader/FragShader.shader");
 	shader.Bind();
 
 	Texture texture("./res/textures/texture.png");
