@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <cstring>
+#include <thread>
 
 #include <GL/glew.h>
 
@@ -11,6 +12,28 @@
 #include <VertexBufferLayout.h>
 #include <Shader.h>
 #include <Texture.h>
+#include <Display.h>
+
+/* Thread task to get input from command line */
+void getInputFromCommandLine(Display& display)
+{
+	while (true) {
+		std::string input;
+		unsigned char AppID;
+		unsigned char* data;
+
+		std::cout << "Enter a AppID: ";
+		std::getline(std::cin, input);
+		AppID = std::stoi(input);
+
+		std::cout << "Enter Data: ";
+		std::getline(std::cin, input);
+
+		data = new unsigned char[input.length()];
+		memcpy(data, input.c_str(), input.length());
+		display.CreateFormat(AppID, data, input.length());
+	}
+}
 
 int main(int argc, char** argv)
 {
@@ -116,17 +139,12 @@ int main(int argc, char** argv)
 	shader.Unbind();
 
 	Renderer renderer;
+	Display display;
 
-	// Get the location of the uniform
-	float r = 0.0f;
-	float g = 0.0f;
-	float b = 0.0f;
-	float r_increment = 0.05f;
-	float g_increment = 0.03f;
-	float b_increment = 0.04f;
+	unsigned char* data = NULL;
+	unsigned int data_length;
 
-	int count_frames = 0;
-	int data_count = 0;
+	std::thread getInputThread(getInputFromCommandLine, std::ref(display));
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
@@ -136,35 +154,10 @@ int main(int argc, char** argv)
 
 		renderer.Draw(va, ib, shader);
 
-		if (r > 1.0f) {
-			r_increment = -0.05f;
-		} else if (r < 0.0f) {
-			r_increment = 0.05f;
-		}
-
-		if (g > 1.0f) {
-			g_increment = -0.03f;
-		} else if (g < 0.0f) {
-			g_increment = 0.03f;
-		}
-
-		if (b > 1.0f) {
-			b_increment = -0.04f;
-		} else if (b < 0.0f) {
-			b_increment = 0.04f;
-		}
-
-		r += r_increment;
-		g += g_increment;
-		b += b_increment;
-
-		count_frames++;
-
-		if (count_frames == 60) {
-			count_frames = 0;
-
-			const std::string& data = std::to_string(data_count++);
-			texture.SetTexture(data, data.length());
+		if (!display.IsEmpty() && display.GetSize() >= 24) {
+			data_length = display.GetSize();
+			data = display.GetFormattedBuffer();
+			texture.SetTexture(data, data_length);
 			texture.Bind();
 		} else {
 			texture.Unbind();
@@ -177,6 +170,8 @@ int main(int argc, char** argv)
 		glfwPollEvents();
 	}
 
+	delete data;
 	glfwTerminate();
 	return 0;
 }
+
