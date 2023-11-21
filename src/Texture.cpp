@@ -46,11 +46,10 @@ void Texture::Unbind() const
 	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 }
 
-void Texture::SetTexture(const std::string& data, unsigned int length) const
+void Texture::SetTexture(unsigned char* data, unsigned int length) const
 {
 	memset(m_LocalBuffer, 0x00, FRAME_SIZE);
-	memcpy(m_LocalBuffer, data.c_str(), length);
-	std::cout << "Data: " << data.c_str() << std::endl;
+	memcpy(m_LocalBuffer, data, length);
 
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));
 	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_Width, m_Height, 0,

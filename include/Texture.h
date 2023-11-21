@@ -14,7 +14,7 @@ class Texture
 		void Bind(unsigned int slot = 0) const;
 		void Unbind() const;
 
-		void SetTexture(const std::string& data, unsigned int length) const;
+		void SetTexture(unsigned char* data, unsigned int length) const;
 
 		inline int GetWidth() const { return m_Width; }
 		inline int GetHeight() const { return m_Height; }
