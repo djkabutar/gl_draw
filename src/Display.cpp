@@ -2,6 +2,11 @@
 
 #include <Display.h>
 
+struct PreProcessedBuffer {
+	unsigned char* buffer;
+	unsigned int bufferSize;
+};
+
 Display::Display() {
 }
 
@@ -56,11 +61,51 @@ void Display::EndOfFrame() {
 
 void Display::AddHeader(unsigned char AppID, unsigned int bufferSize, unsigned char rem) {
 	unsigned int packetSize = rem ? (bufferSize / 6) + 1 : bufferSize / 6;
+	unsigned int temp = 0;
+
+	/* The AppID is offset by 1
+	 * The AppID 0x3F is reserved for the bootloader
+	 */
+	if (AppID < 0x3F) {
+		AppID++;
+	}
 	m_displayBuffer.push(AppID);
-	m_displayBuffer.push((packetSize >> 16) & 0xFF);
-	m_displayBuffer.push((packetSize >> 8) & 0xFF);
-	m_displayBuffer.push(packetSize & 0xFF);
+
+	/* The packet size is offset by 1
+	 * The packet size is the number of packets in the frame
+	 */
+	temp = (packetSize >> 16) & 0xFF;
+	if (temp) {
+		if (temp < 0x3F) {
+			temp++;
+		}
+		m_displayBuffer.push(temp);
+	} else {
+		m_displayBuffer.push(0x00);
+	}
+
+	temp = (packetSize >> 8) & 0xFF;
+	if (temp) {
+		if (temp < 0x3F) {
+			temp++;
+		}
+		m_displayBuffer.push(temp);
+	} else {
+		m_displayBuffer.push(0x00);
+	}
+
+	temp = packetSize & 0xFF;
+	if (temp) {
+		if (temp < 0x3F) {
+			temp++;
+		}
+		m_displayBuffer.push(temp);
+	} else {
+		m_displayBuffer.push(0x00);
+	}
+
 	m_displayBuffer.push(GetMask(rem));
+
 	m_displayBuffer.push(0x00);
 }
 
@@ -70,13 +115,51 @@ void Display::clear() {
 	}
 }
 
-void Display::CreateFormat(unsigned char AppID, unsigned char* displayBuffer, unsigned int bufferSize) {
-	unsigned char rem = bufferSize % 6;
-	StartOfFrame();
-	AddHeader(AppID, bufferSize, rem);
+struct PreProcessedBuffer PreProcessingBuffer(unsigned char* displayBuffer, unsigned int bufferSize) {
+	unsigned int escapeCount = 0;
+	for (unsigned int i = 0; i < bufferSize; i++) {
+		if (displayBuffer[i] == 0x3F || displayBuffer[i] == 0x5C) {
+			escapeCount++;
+		}
+	}
 
-	for (unsigned int i = 0; i < bufferSize - rem; i++) {
-		m_displayBuffer.push(displayBuffer[i]);
+	/* Allocate memory for the buffer
+	 * The buffer size is the size of the original buffer plus the number of escape characters
+	 * The escape characters are 0x3F and 0x5C
+	 * This is because lesser than 0x40 characters are being offset by 1
+	 */
+	unsigned char* buffer = new unsigned char[bufferSize + escapeCount];
+	for (unsigned int i = 0; i < bufferSize; i++) {
+		if (displayBuffer[i] < 0x3F) {
+			buffer[i] = displayBuffer[i] + 1;
+		} else if (displayBuffer[i] == 0x3F) {
+			buffer[i++] = 0x5C;
+			buffer[i] = 0x3F;
+		} else if (displayBuffer[i] == 0x5C) {
+			buffer[i++] = 0x5C;
+			buffer[i] = 0x5C;
+		} else {
+			buffer[i] = displayBuffer[i];
+		}
+	}
+
+	return { buffer, bufferSize + escapeCount };
+}
+
+void Display::CreateFormat(unsigned char AppID, unsigned char* displayBuffer, unsigned int bufferSize) {
+	/* Do pre-processing on the buffer
+	 * This is to escape the characters 0x3F and 0x5C
+	 * 0x3F is escaped as 0x5C 0x3F
+	 * 0x5C is escaped as 0x5C 0x5C
+	 */
+	struct PreProcessedBuffer preProcessedBuffer = PreProcessingBuffer(displayBuffer, bufferSize);
+	unsigned char rem = preProcessedBuffer.bufferSize % 6;
+
+	StartOfFrame();
+	AddHeader(AppID, preProcessedBuffer.bufferSize, rem);
+
+	for (unsigned int i = 0; i < preProcessedBuffer.bufferSize - rem; i++) {
+		m_displayBuffer.push(preProcessedBuffer.buffer[i]);
 	}
 
 	if (rem) {
@@ -84,8 +167,8 @@ void Display::CreateFormat(unsigned char AppID, unsigned char* displayBuffer, un
 			m_displayBuffer.push(0x00);
 		}
 
-		for (unsigned int i = bufferSize - rem; i < bufferSize; i++) {
-			m_displayBuffer.push(displayBuffer[i]);
+		for (unsigned int i = preProcessedBuffer.bufferSize - rem; i < preProcessedBuffer.bufferSize; i++) {
+			m_displayBuffer.push(preProcessedBuffer.buffer[i]);
 		}
 	}
 
@@ -100,7 +183,6 @@ unsigned char* Display::GetFormattedBuffer() {
 	for (unsigned int i = 0; i < bufferSize; i++) {
 		buffer[i] = m_displayBuffer.front();
 		m_displayBuffer.pop();
-		std::cout << "Buffer: 0x" << std::hex << (int)buffer[i] << std::endl;
 	}
 
 	return buffer;

@@ -32,6 +32,23 @@ void getInputFromCommandLine(Display& display)
 		data = new unsigned char[input.length()];
 		memcpy(data, input.c_str(), input.length());
 		display.CreateFormat(AppID, data, input.length());
+
+		/* Get File name from the command line */
+		// std::cout << "Enter File name: ";
+		// std::getline(std::cin, input);
+
+		// /* Open file and create format */
+		// std::ifstream file;
+		// file.open(input, std::ios::in | std::ios::binary);
+		// file.seekg(0, std::ios::end);
+		// int length = file.tellg();
+		// file.seekg(0, std::ios::beg);
+
+		// data = new unsigned char[length];
+		// file.read((char*)data, length);
+		// file.close();
+
+		// display.CreateFormat(0x56, data, length);
 	}
 }
 
@@ -157,6 +174,13 @@ int main(int argc, char** argv)
 		if (!display.IsEmpty() && display.GetSize() >= 24) {
 			data_length = display.GetSize();
 			data = display.GetFormattedBuffer();
+
+			/* Store the data in to the File */
+			std::ofstream file;
+			file.open("data.txt", std::ios::out | std::ios::binary);
+			file.write((char*)data, data_length);
+			file.close();
+
 			texture.SetTexture(data, data_length);
 			texture.Bind();
 		} else {
