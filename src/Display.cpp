@@ -129,18 +129,20 @@ struct PreProcessedBuffer PreProcessingBuffer(unsigned char* displayBuffer, unsi
 	 * This is because lesser than 0x40 characters are being offset by 1
 	 */
 	unsigned char* buffer = new unsigned char[bufferSize + escapeCount];
+	unsigned int j = 0;
 	for (unsigned int i = 0; i < bufferSize; i++) {
 		if (displayBuffer[i] < 0x3F) {
-			buffer[i] = displayBuffer[i] + 1;
+			buffer[j] = displayBuffer[i] + 1;
 		} else if (displayBuffer[i] == 0x3F) {
-			buffer[i++] = 0x5C;
-			buffer[i] = 0x3F;
+			buffer[j++] = 0x5C;
+			buffer[j] = 0x3F;
 		} else if (displayBuffer[i] == 0x5C) {
-			buffer[i++] = 0x5C;
-			buffer[i] = 0x5C;
+			buffer[j++] = 0x5C;
+			buffer[j] = 0x5C;
 		} else {
-			buffer[i] = displayBuffer[i];
+			buffer[j] = displayBuffer[i];
 		}
+		j++;
 	}
 
 	return { buffer, bufferSize + escapeCount };
