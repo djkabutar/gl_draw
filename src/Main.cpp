@@ -19,36 +19,37 @@ void getInputFromCommandLine(Display& display)
 {
 	while (true) {
 		std::string input;
-		unsigned char AppID;
+		// unsigned char AppID;
 		unsigned char* data;
 
-		std::cout << "Enter a AppID: ";
-		std::getline(std::cin, input);
-		AppID = std::stoi(input);
+		// std::cout << "Enter a AppID: ";
+		// std::getline(std::cin, input);
+		// AppID = std::stoi(input);
 
-		std::cout << "Enter Data: ";
-		std::getline(std::cin, input);
-
-		data = new unsigned char[input.length()];
-		memcpy(data, input.c_str(), input.length());
-		display.CreateFormat(AppID, data, input.length());
-
-		/* Get File name from the command line */
-		// std::cout << "Enter File name: ";
+		// std::cout << "Enter Data: ";
 		// std::getline(std::cin, input);
 
-		// /* Open file and create format */
-		// std::ifstream file;
-		// file.open(input, std::ios::in | std::ios::binary);
-		// file.seekg(0, std::ios::end);
-		// int length = file.tellg();
-		// file.seekg(0, std::ios::beg);
+		// data = new unsigned char[input.length()];
+		// memcpy(data, input.c_str(), input.length());
+		// display.CreateFormat(AppID, data, input.length());
 
-		// data = new unsigned char[length];
-		// file.read((char*)data, length);
-		// file.close();
+		/* Get File name from the command line */
+		std::cout << "Enter File name: ";
+		std::getline(std::cin, input);
 
-		// display.CreateFormat(0x56, data, length);
+		/* Open file and create format */
+		std::ifstream file;
+		file.open(input, std::ios::in | std::ios::binary);
+		file.seekg(0, std::ios::end);
+		int length = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		data = new unsigned char[length];
+		file.read((char*)data, length);
+		file.close();
+		std::cout << "File length: " << length << std::endl;
+
+		display.CreateFormat(0x56, data, length);
 	}
 }
 
@@ -160,6 +161,7 @@ int main(int argc, char** argv)
 
 	unsigned char* data = NULL;
 	unsigned int data_length;
+	bool dataSent = false;
 
 	std::thread getInputThread(getInputFromCommandLine, std::ref(display));
 
@@ -172,19 +174,25 @@ int main(int argc, char** argv)
 		renderer.Draw(va, ib, shader);
 
 		if (!display.IsEmpty() && display.GetSize() >= 24) {
+			renderer.Draw(va, ib, shader);
+
 			data_length = display.GetSize();
 			data = display.GetFormattedBuffer();
 
 			/* Store the data in to the File */
-			std::ofstream file;
-			file.open("data.txt", std::ios::out | std::ios::binary);
-			file.write((char*)data, data_length);
-			file.close();
+			// std::ofstream file;
+			// file.open("data.txt", std::ios::out | std::ios::binary);
+			// file.write((char*)data, data_length);
+			// file.close();
 
 			texture.SetTexture(data, data_length);
 			texture.Bind();
-		} else {
+
+			dataSent = true;
+		} else if (dataSent) {
 			texture.Unbind();
+
+			dataSent = false;
 		}
 
 		/* Swap front and back buffers */
